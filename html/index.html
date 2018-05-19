@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>promise</title>
+    <style>
+        *{padding: 0;margin: 0;}
+        html{ background:#02aff1}
+        .wrapper{width: 1000px; margin: 0 auto;}
+        h1{ font-size: 25px; font-weight: normal; padding: 20px 0; text-align: center; line-height: 40px; color: #fff; font-weight: bold;}
+        h2{ font-size: 16px; font-weight: normal; line-height: 30px; width:302px; margin: 30px auto 10px; color: #fff;}
+        input{ width: 300px; height: 30px; line-height: 30px; font-size: 14px; color: #424242; display: block; margin: 0 auto; text-indent: 10px; outline: none; border: 1px solid #999;}
+        .list{ width:302px; margin:0 auto; border: 1px solid #eee; padding: 60px; box-sizing:border-box; line-height: 30px; font-size: 14px; color: #666;}
+        .list p{ color: #fff;}
+        /*loading*/
+        .skype-loader {
+          width: 80px;
+          height: 80px;
+          position: relative;
+          margin: auto;
+        }
+
+        .skype-loader .dot {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 80px;
+          height: 80px;
+
+          animation: 1.7s dotrotate cubic-bezier(0.775, 0.005, 0.310, 1.000) infinite;
+        }
+
+        .skype-loader .dot:nth-child(1) {
+          animation-delay: 0.2s;
+        }
+
+        .skype-loader .dot:nth-child(2) {
+          animation-delay: 0.35s;
+        }
+
+        .skype-loader .dot:nth-child(3) {
+          animation-delay: 0.45s;
+        }
+
+        .skype-loader .dot:nth-child(4) {
+          animation-delay: 0.55s;
+        }
+
+        .skype-loader .dot:after, .skype-loader .dot .first {
+          content: "";
+          position: absolute;
+          width: 8px;
+          height: 8px;
+          background: white;
+          border-radius: 50%;
+          left: 50%;
+          margin-left: -4px;
+        }
+
+        .skype-loader .dot .first {
+          background: #fff;
+          margin-top: -4px;
+          animation: 1.7s dotscale cubic-bezier(0.775, 0.005, 0.310, 1.000) infinite;
+          animation-delay: 0.2s;
+        }
+
+        @keyframes dotrotate { 
+          from { transform: rotate(0deg); } 
+          to { transform: rotate(360deg); }
+        }
+
+        @keyframes dotscale { 
+          0%, 10% { width: 16px; height: 16px; margin-left: -8px;  margin-top: -4px; } 
+          50% { width: 8px; height: 8px; margin-left: -4px; margin-top: 0; }
+          90%, 100% { width: 16px; height: 16px;  margin-left: -8px;  margin-top: -4px; }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <h1>电信选号</h1>
+        <input id="input" type="text" placeholder="xxx">
+        <h2>搜索列表</h2>
+        <div id="list" class="list">
+            <div class="skype-loader">
+                <div class="dot">
+                    <div class="first"></div>
+                </div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+
+        </div>
+    </div>
+</body>
+<script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script>
+    /*
+        *1.使用了map()方法    （ES5）
+        *2.使用了foEach()方法 （ES5）
+        *3.promise            （ES6）
+        *4.箭头函数           （ES6）
+     */
+    const getdata = (pageindex)=>{
+        return  new Promise ((resolve,reject)=>{
+            $.getJSON("/data", {pageindex: pageindex},(res)=>{
+                console.log(res)
+                resolve(res)
+            });
+        })
+    };
+    const findNum = (key)=>{
+        var p = $('#list p');
+        p.each((index,cur)=>{
+            if($(cur).text().indexOf(key)>=0){
+                $(cur).show()
+            }else{
+                $(cur).hide()
+            }
+        })
+    };
+    const createList = (array)=>{
+        var ul = $('#list')
+        ul.html('')
+        array.forEach(obj => {
+           let listphones = obj.dataObject.listphones;
+           
+            // let listphones =[
+            //     {phoneNumber:15231115555},
+            //     {phoneNumber:15331115555},
+            //     {phoneNumber:15431115555},
+            //     {phoneNumber:15531115555},
+            //     {phoneNumber:15631115555},
+            //     {phoneNumber:15731115555},
+            //     {phoneNumber:15831115555},
+            //     {phoneNumber:15931115555}
+            // ];
+
+            if(listphones){
+                listphones.forEach(item => {
+                    ul.append(`<p>${item.phoneNumber}</p>`)
+                });
+            }
+        })
+    };
+    const start = (len)=>{
+        let arrayPage = [];
+        for(let i=1;i<=len;i++){
+            arrayPage.push(i)
+        }
+        Promise.all(arrayPage.map(item=>{
+            return getdata(item)
+        })).then(results=>{
+            console.log(results)
+            createList(results)
+        })
+    };
+    start(5)
+    $('#input').on('input',event=>{
+        let val = event.target.value
+        findNum(val)
+    });
+</script>
+</html>

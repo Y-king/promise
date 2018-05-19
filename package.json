@@ -1,0 +1,20 @@
+{
+  "name": "promise",
+  "version": "1.0.0",
+  "description": "练习ES6中promise的用法",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "ES6、Promise"
+  ],
+  "author": "king900714@126.com/739423210@qq.com",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "express": "^4.16.3",
+    "nodemon": "^1.17.4"
+  }
+}
